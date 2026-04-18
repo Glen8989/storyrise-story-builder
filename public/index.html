@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storyrise — Story Builder</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sage: #7BA99A;
+    --sage-light: #D4E8E3;
+    --sage-dark: #4A7066;
+    --terra: #C4856A;
+    --terra-light: #F0D8CE;
+    --beige: #F7F3EE;
+    --cream: #FDFAF6;
+    --dark: #3D3D3D;
+    --mid: #6B6B6B;
+    --light-rule: #D8D0C8;
+    --white: #ffffff;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--beige);
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--sage);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo { color: white; font-weight: 700; font-size: 15px; letter-spacing: 0.05em; }
+  .logo span { font-weight: 400; opacity: 0.75; font-size: 12px; margin-left: 10px; letter-spacing: 0; }
+  .tagline { color: white; font-size: 11px; opacity: 0.7; font-style: italic; }
+
+  /* LAYOUT */
+  .container { max-width: 780px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  .hero { text-align: center; margin-bottom: 32px; }
+  .hero h1 { font-size: 28px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+  .hero p { font-size: 15px; color: var(--mid); line-height: 1.6; max-width: 520px; margin: 0 auto; }
+
+  /* SPEC BADGES */
+  .specs { display: flex; gap: 10px; justify-content: center; margin: 16px 0 0; flex-wrap: wrap; }
+  .spec-badge {
+    background: var(--white);
+    border: 0.5px solid var(--light-rule);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: var(--mid);
+  }
+  .spec-badge strong { color: var(--sage-dark); }
+
+  /* SECTIONS */
+  .section {
+    background: var(--white);
+    border: 0.5px solid var(--light-rule);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 14px;
+  }
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 14px;
+  }
+  .section-hint {
+    font-size: 12px;
+    color: var(--mid);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  /* FORM ELEMENTS */
+  label { font-size: 13px; color: var(--mid); display: block; margin-bottom: 5px; margin-top: 14px; }
+  label:first-of-type { margin-top: 0; }
+  input[type=text], select, textarea {
+    width: 100%;
+    border: 0.5px solid var(--light-rule);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--dark);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--sage); }
+  textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+  select { cursor: pointer; }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media(max-width:520px){ .row2 { grid-template-columns: 1fr; } }
+
+  /* CHARACTERS */
+  .char-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  @media(max-width:560px){ .char-grid { grid-template-columns: repeat(2,1fr); } }
+
+  .char-card {
+    background: var(--beige);
+    border: 0.5px solid var(--light-rule);
+    border-radius: var(--radius-md);
+    padding: 12px 10px 10px;
+    position: relative;
+    text-align: center;
+  }
+  .char-num {
+    position: absolute; top: 7px; left: 9px;
+    font-size: 10px; color: var(--light-rule); font-weight: 600;
+  }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #e8e4df; border: 0.5px solid var(--light-rule);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 600; color: var(--mid);
+    margin: 0 auto 9px; transition: background 0.15s, color 0.15s;
+  }
+  .avatar.filled { background: var(--sage-light); color: var(--sage-dark); }
+  .char-card input { font-size: 12px; text-align: center; padding: 5px 6px; }
+  .char-card select { font-size: 11px; padding: 4px 5px; margin-top: 5px; }
+
+  /* AGE CHIPS */
+  .age-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    padding: 6px 15px;
+    border: 0.5px solid var(--light-rule);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--mid);
+    cursor: pointer;
+    background: var(--white);
+    transition: all 0.12s;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--sage); color: var(--sage-dark); }
+  .chip.active {
+    background: var(--sage-light);
+    border-color: var(--sage);
+    color: var(--sage-dark);
+    font-weight: 600;
+  }
+
+  /* LESSON CHIPS */
+  .lesson-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .lesson-chip {
+    padding: 5px 12px;
+    border: 0.5px dashed var(--light-rule);
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--mid);
+    cursor: pointer;
+    background: var(--beige);
+    transition: all 0.12s;
+  }
+  .lesson-chip:hover { border-color: var(--sage); color: var(--sage-dark); background: var(--sage-light); }
+  .lesson-chips-label { font-size: 11px; color: var(--light-rule); margin-top: 12px; margin-bottom: 0; }
+  hr.divider { border: none; border-top: 0.5px solid var(--light-rule); margin: 14px 0 10px; }
+
+  /* BEATS */
+  .beats-list { display: flex; flex-direction: column; gap: 8px; }
+  .beat-row { display: flex; gap: 8px; align-items: center; }
+  .beat-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--beige); border: 0.5px solid var(--light-rule);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: var(--mid); flex-shrink: 0;
+  }
+  .beat-row input { flex: 1; }
+  .beat-remove {
+    background: none; border: none; color: var(--light-rule);
+    cursor: pointer; font-size: 18px; line-height: 1;
+    padding: 2px 6px; border-radius: 4px; flex-shrink: 0;
+    transition: color 0.1s, background 0.1s;
+  }
+  .beat-remove:hover { color: #c0392b; background: #fdf0ee; }
+
+  .add-btn {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 13px; color: var(--sage-dark);
+    background: none;
+    border: 0.5px dashed var(--sage);
+    border-radius: var(--radius-sm);
+    padding: 8px 16px; cursor: pointer;
+    width: 100%; justify-content: center; margin-top: 10px;
+    transition: background 0.12s;
+  }
+  .add-btn:hover { background: var(--sage-light); }
+  .add-icon {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--sage-light); color: var(--sage-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+
+  /* ACTIONS */
+  .actions { display: flex; gap: 12px; margin-top: 6px; }
+  .btn-clear {
+    flex: 1; background: var(--white);
+    border: 0.5px solid var(--light-rule);
+    border-radius: var(--radius-md); padding: 12px 16px;
+    font-size: 14px; cursor: pointer; color: var(--mid);
+    font-family: inherit; transition: background 0.12s;
+  }
+  .btn-clear:hover { background: var(--beige); }
+  .btn-generate {
+    flex: 2; background: var(--sage);
+    border: none; border-radius: var(--radius-md);
+    padding: 12px 20px; font-size: 15px; font-weight: 600;
+    cursor: pointer; color: white; font-family: inherit;
+    transition: background 0.12s;
+  }
+  .btn-generate:hover { background: var(--sage-dark); }
+  .btn-generate:disabled { background: var(--light-rule); cursor: not-allowed; }
+
+  /* OUTPUT */
+  #outputSection {
+    display: none;
+    background: var(--white);
+    border: 0.5px solid var(--light-rule);
+    border-radius: var(--radius-lg);
+    margin-top: 14px;
+    overflow: hidden;
+  }
+  .output-header {
+    background: var(--sage);
+    padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .output-header h2 { color: white; font-size: 14px; font-weight: 600; }
+  .btn-copy {
+    background: rgba(255,255,255,0.2); border: 0.5px solid rgba(255,255,255,0.4);
+    border-radius: var(--radius-sm); padding: 6px 14px;
+    font-size: 12px; color: white; cursor: pointer; font-family: inherit;
+    transition: background 0.12s;
+  }
+  .btn-copy:hover { background: rgba(255,255,255,0.3); }
+  #storyOutput {
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--dark);
+    white-space: pre-wrap;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+
+  /* LOADING */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--sage-light);
+    border-top-color: var(--sage);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 14px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading p { color: var(--mid); font-size: 13px; }
+
+  /* ERROR */
+  .error-box {
+    display: none;
+    background: #fdf0ee;
+    border: 0.5px solid #e8b4aa;
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #8b3a2a;
+    margin-top: 10px;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 11px;
+    color: var(--light-rule);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">STORYRISE <span>Story Builder — Trial</span></div>
+  <div class="tagline">Stories that prepare kids for life.</div>
+</header>
+
+<div class="container">
+
+  <div class="hero">
+    <h1>Build a Storyrise story</h1>
+    <p>Fill in the details below and we'll generate a complete, personalised children's story — page by page, ready for illustration.</p>
+    <div class="specs">
+      <div class="spec-badge"><strong>12–16</strong> pages</div>
+      <div class="spec-badge"><strong>10–30</strong> words per page</div>
+      <div class="spec-badge">Illustration notes <strong>included</strong></div>
+      <div class="spec-badge">Age-appropriate <strong>language</strong></div>
+    </div>
+  </div>
+
+  <!-- CHARACTERS -->
+  <div class="section">
+    <div class="section-label">Characters — up to 4</div>
+    <div class="char-grid">
+      <div class="char-card"><span class="char-num">1</span><div class="avatar" id="av0">?</div><input type="text" id="cn0" placeholder="Name" oninput="updateAvatar(0)"><select id="cr0"><option value="">Role...</option><option>Main character</option><option>Parent / caregiver</option><option>Sibling</option><option>Grandparent</option><option>Friend</option><option>Teacher</option><option>Other</option></select></div>
+      <div class="char-card"><span class="char-num">2</span><div class="avatar" id="av1">+</div><input type="text" id="cn1" placeholder="Name" oninput="updateAvatar(1)"><select id="cr1"><option value="">Role...</option><option>Main character</option><option>Parent / caregiver</option><option>Sibling</option><option>Grandparent</option><option>Friend</option><option>Teacher</option><option>Other</option></select></div>
+      <div class="char-card"><span class="char-num">3</span><div class="avatar" id="av2">+</div><input type="text" id="cn2" placeholder="Name" oninput="updateAvatar(2)"><select id="cr2"><option value="">Role...</option><option>Main character</option><option>Parent / caregiver</option><option>Sibling</option><option>Grandparent</option><option>Friend</option><option>Teacher</option><option>Other</option></select></div>
+      <div class="char-card"><span class="char-num">4</span><div class="avatar" id="av3">+</div><input type="text" id="cn3" placeholder="Name" oninput="updateAvatar(3)"><select id="cr3"><option value="">Role...</option><option>Main character</option><option>Parent / caregiver</option><option>Sibling</option><option>Grandparent</option><option>Friend</option><option>Teacher</option><option>Other</option></select></div>
+    </div>
+  </div>
+
+  <!-- CATEGORY -->
+  <div class="section">
+    <div class="section-label">Category</div>
+    <div class="row2">
+      <div><label>Category</label><select id="catSel" onchange="updateSubs()"><option value="">Select category...</option><option>Sleep</option><option>Behaviour &amp; Emotions</option><option>Eating &amp; Nutrition</option><option>Transitions</option><option>Values &amp; Life Skills</option><option>Hygiene &amp; Independence</option><option>Safety &amp; Public Behaviour</option><option>Medical &amp; New Experiences</option><option>Grief &amp; Healing</option><option>Just for Fun</option></select></div>
+      <div><label>Sub-category</label><select id="subSel"><option value="">Select category first...</option></select></div>
+    </div>
+  </div>
+
+  <!-- AGE -->
+  <div class="section">
+    <div class="section-label">Age of child</div>
+    <div class="section-hint">Selecting an age automatically applies the correct vocabulary level, word count, sentence complexity, and repetition rules for that age group.</div>
+    <div class="age-chips" id="ageChips">
+      <div class="chip" onclick="selectAge(this,'2')">2 yrs</div>
+      <div class="chip" onclick="selectAge(this,'3')">3 yrs</div>
+      <div class="chip" onclick="selectAge(this,'4')">4 yrs</div>
+      <div class="chip" onclick="selectAge(this,'5')">5 yrs</div>
+      <div class="chip" onclick="selectAge(this,'6')">6 yrs</div>
+      <div class="chip" onclick="selectAge(this,'7')">7 yrs</div>
+      <div class="chip" onclick="selectAge(this,'8')">8 yrs</div>
+      <div class="chip" onclick="selectAge(this,'9')">9 yrs</div>
+      <div class="chip" onclick="selectAge(this,'10')">10 yrs</div>
+      <div class="chip" onclick="selectAge(this,'11')">11 yrs</div>
+      <div class="chip" onclick="selectAge(this,'12')">12 yrs</div>
+    </div>
+  </div>
+
+  <!-- LESSONS -->
+  <div class="section">
+    <div class="section-label">Key messages &amp; lessons</div>
+    <div class="section-hint">What should the child feel or take away from this story? These are woven in as experiences — not stated as lessons.</div>
+    <textarea id="lessons" placeholder="e.g. Mia learns that she is safe and loved even when mum and dad aren't in the room. She discovers her bedtime routine is something to look forward to. She feels proud that she can fall asleep all on her own."></textarea>
+    <hr class="divider">
+    <label class="lesson-chips-label">Quick add:</label>
+    <div class="lesson-chips">
+      <div class="lesson-chip" onclick="addLesson('I am safe and loved')">I am safe and loved</div>
+      <div class="lesson-chip" onclick="addLesson('I am brave and capable')">I am brave and capable</div>
+      <div class="lesson-chip" onclick="addLesson('I can do hard things')">I can do hard things</div>
+      <div class="lesson-chip" onclick="addLesson('My feelings are okay')">My feelings are okay</div>
+      <div class="lesson-chip" onclick="addLesson('I can ask for help')">I can ask for help</div>
+      <div class="lesson-chip" onclick="addLesson('Change can be good')">Change can be good</div>
+      <div class="lesson-chip" onclick="addLesson('I am ready for this')">I am ready for this</div>
+      <div class="lesson-chip" onclick="addLesson('Mum and dad always come back')">Mum and dad always come back</div>
+      <div class="lesson-chip" onclick="addLesson('I am not alone')">I am not alone</div>
+      <div class="lesson-chip" onclick="addLesson('I can fall asleep on my own')">I can fall asleep on my own</div>
+      <div class="lesson-chip" onclick="addLesson('Trying new things is exciting')">Trying new things is exciting</div>
+    </div>
+  </div>
+
+  <!-- BEATS -->
+  <div class="section">
+    <div class="section-label">Story beats &amp; milestones</div>
+    <div class="section-hint">The key moments that happen in the story, in order. These are woven naturally across the pages.</div>
+    <div class="beats-list" id="beatsList"></div>
+    <button class="add-btn" onclick="addBeat()"><span class="add-icon">+</span> Add another beat</button>
+  </div>
+
+  <!-- DETAILS -->
+  <div class="section">
+    <div class="section-label">Key details</div>
+    <label>Personal details to bring the story to life</label>
+    <textarea id="details" placeholder="e.g. Mia sleeps in the lower bunk of a bunk bed. Her bedroom is girly with fairy lights. She cuddles a rainbow unicorn and a blue horse. The family lives in Brisbane."></textarea>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="actions">
+    <button class="btn-clear" onclick="clearForm()">Clear</button>
+    <button class="btn-generate" id="generateBtn" onclick="generateStory()">Write my story →</button>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Writing your story — this takes about 20 seconds...</p>
+  </div>
+
+  <!-- OUTPUT -->
+  <div id="outputSection">
+    <div class="output-header">
+      <h2>Your Storyrise story</h2>
+      <button class="btn-copy" onclick="copyStory()">Copy story</button>
+    </div>
+    <div id="storyOutput"></div>
+  </div>
+
+</div>
+
+<footer>© 2026 Storyrise — Confidential trial. Not for external distribution.</footer>
+
+<script>
+const SUBS = {
+  "Sleep":["Falling asleep independently","Routine & consistency","Calling out & getting out of bed","Night waking","Sleep associations (breaking habits)","Early wakings","Fear of the dark & night terrors"],
+  "Behaviour & Emotions":["Anger, hitting & big reactions","Tantrums & meltdowns","Emotional awareness & regulation","Social skills & friendships","Communication & expression","Boundaries & listening","Confidence & resilience"],
+  "Eating & Nutrition":["Understanding food & the body","Picky eating & mealtime battles","Allergies & safety","Sugar, treats & boundaries","Food transitions","Sensory & texture challenges","Eating outside the home"],
+  "Transitions":["Starting daycare / kindy / school","Separation from parents","Home & family changes","New environments & overnight stays","Everyday transitions"],
+  "Values & Life Skills":["Gratitude","Resilience","Empathy","Honesty","Respect","Patience"],
+  "Hygiene & Independence":["Personal hygiene","Getting dressed & independence","Toilet training & body awareness","Screen time & tech habits"],
+  "Safety & Public Behaviour":["Body safety","Road & public safety","Stranger awareness"],
+  "Medical & New Experiences":["Medical appointments","New experiences"],
+  "Grief & Healing":["Losing a loved one","Healing & coping tools","Pet loss"],
+  "Just for Fun":["Celebrations & seasonal","Adventures & experiences"]
+};
+
+const AGE_PARAMS = {
+  "2": {band:"2–4",words:15,sentences:"single sentence preferred",vocab:"very simple everyday words only",rep:"required"},
+  "3": {band:"2–4",words:15,sentences:"single sentence preferred",vocab:"very simple everyday words only",rep:"required"},
+  "4": {band:"2–4",words:15,sentences:"single sentence preferred",vocab:"very simple everyday words only",rep:"required"},
+  "5": {band:"5–8",words:25,sentences:"2–3 sentences",vocab:"simple and clear",rep:"encouraged"},
+  "6": {band:"5–8",words:25,sentences:"2–3 sentences",vocab:"simple and clear",rep:"encouraged"},
+  "7": {band:"5–8",words:25,sentences:"2–3 sentences",vocab:"simple and clear",rep:"encouraged"},
+  "8": {band:"5–8",words:25,sentences:"2–3 sentences",vocab:"simple and clear",rep:"encouraged"},
+  "9": {band:"9–12",words:30,sentences:"2–3 sentences",vocab:"richer vocabulary permitted",rep:"optional"},
+  "10":{band:"9–12",words:30,sentences:"2–3 sentences",vocab:"richer vocabulary permitted",rep:"optional"},
+  "11":{band:"9–12",words:30,sentences:"2–3 sentences",vocab:"richer vocabulary permitted",rep:"optional"},
+  "12":{band:"9–12",words:30,sentences:"2–3 sentences",vocab:"richer vocabulary permitted",rep:"optional"},
+};
+
+let selectedAge = null;
+let beatCount = 0;
+
+function selectAge(el, age) {
+  document.querySelectorAll('#ageChips .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  selectedAge = age;
+}
+
+function addLesson(text) {
+  const ta = document.getElementById('lessons');
+  const cur = ta.value.trim();
+  ta.value = cur ? cur + ' ' + text + '.' : text + '.';
+}
+
+function updateAvatar(i) {
+  const v = document.getElementById('cn' + i).value.trim();
+  const av = document.getElementById('av' + i);
+  av.textContent = v ? v.charAt(0).toUpperCase() : (i === 0 ? '?' : '+');
+  av.classList.toggle('filled', !!v);
+}
+
+function updateSubs() {
+  const cat = document.getElementById('catSel').value;
+  const sub = document.getElementById('subSel');
+  if (!cat) { sub.innerHTML = '<option value="">Select category first...</option>'; return; }
+  const opts = SUBS[cat] || [];
+  sub.innerHTML = '<option value="">Select sub-category...</option>' + opts.map(s => `<option>${s}</option>`).join('');
+}
+
+function addBeat() {
+  beatCount++;
+  const n = document.getElementById('beatsList').children.length + 1;
+  const div = document.createElement('div');
+  div.className = 'beat-row';
+  div.innerHTML = `<div class="beat-num">${n}</div><input type="text" placeholder="Story beat ${n}..."><button class="beat-remove" onclick="removeBeat(this)">×</button>`;
+  document.getElementById('beatsList').appendChild(div);
+  renumberBeats();
+}
+
+function removeBeat(btn) { btn.closest('.beat-row').remove(); renumberBeats(); }
+
+function renumberBeats() {
+  document.querySelectorAll('#beatsList .beat-num').forEach((el, i) => { el.textContent = i + 1; });
+  document.querySelectorAll('#beatsList input').forEach((el, i) => { el.placeholder = `Story beat ${i + 1}...`; });
+}
+
+function clearForm() {
+  [0,1,2,3].forEach(i => { document.getElementById('cn'+i).value=''; document.getElementById('cr'+i).value=''; updateAvatar(i); });
+  document.getElementById('catSel').value = '';
+  updateSubs();
+  document.getElementById('lessons').value = '';
+  document.getElementById('details').value = '';
+  document.getElementById('beatsList').innerHTML = '';
+  document.querySelectorAll('#ageChips .chip').forEach(c => c.classList.remove('active'));
+  selectedAge = null; beatCount = 0;
+  for(let i=0;i<5;i++) addBeat();
+  document.getElementById('outputSection').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+}
+
+function buildPrompt() {
+  const chars = [];
+  [0,1,2,3].forEach(i => {
+    const n = document.getElementById('cn'+i).value.trim();
+    const r = document.getElementById('cr'+i).value;
+    if(n) chars.push(n + (r ? ' (' + r + ')' : ''));
+  });
+  const cat = document.getElementById('catSel').value;
+  const sub = document.getElementById('subSel').value;
+  const lessons = document.getElementById('lessons').value.trim();
+  const beats = Array.from(document.querySelectorAll('#beatsList input')).map(i => i.value.trim()).filter(Boolean);
+  const details = document.getElementById('details').value.trim();
+  const ageP = selectedAge ? AGE_PARAMS[selectedAge] : null;
+
+  let p = `You are a children's story writer for Storyrise — the original personalised social story brand. Write a warm, purposeful, ready-to-publish children's story.\n\n`;
+  p += `BRAND VOICE: Calm, nurturing, empowering, purposeful. Warm and intelligent — not loud, babyish, or clinical. Every word earns its place.\n\n`;
+  p += `BRAND VALUES: Faith woven naturally where relevant — never preachy. Childhood is sacred. Stories must be safe, age-appropriate, and positively formative. Help the child feel seen, understood, and ready. Strengthen family connection.\n\n`;
+  p += `STRICT FORMAT RULES:\n- Exactly 12 to 16 pages\n- Format every page as: PAGE [number] then the story text\n- After each page: [Illustration note: who is in the scene, what is happening, the emotional tone, and the lighting]\n- Illustrations: soft, warm, muted, nature-inspired, emotionally safe — never overstimulating\n- Arc: warm opening (pages 1–2) → journey through beats → calm affirming close (final 2 pages)\n- No titles, briefs, or summaries — story pages only\n- Exclamation marks on opening pages only — maximum 2 across the whole story\n- Main character's name on every page\n- At least 2 direct affirmations of the child\n- Conflict: mild acknowledgement of difficulty, always resolved warmly\n\n`;
+
+  if(ageP) {
+    p += `AGE PARAMETERS (child is ${selectedAge} years old — band ${ageP.band}):\n- Max ${ageP.words} words per page\n- ${ageP.sentences} per page\n- Vocabulary: ${ageP.vocab}\n- Repetition: ${ageP.rep}\n`;
+    if(ageP.band==="2–4") p += `- Illustration carries the story — text is the warm anchor only\n`;
+    if(ageP.band==="5–8") p += `- Emotional nuance permitted and encouraged\n`;
+    if(ageP.band==="9–12") p += `- Richer emotional themes permitted — respect the child's intelligence\n`;
+    p += `\n`;
+  }
+
+  if(lessons) p += `KEY MESSAGES (weave as experience, never state as lessons):\n${lessons}\n\n`;
+  p += `STORY DETAILS:\n`;
+  if(chars.length) p += `Characters: ${chars.join(', ')}\n`;
+  if(cat) p += `Category: ${cat}${sub?' > '+sub:''}\n`;
+  if(beats.length) p += `Story beats:\n${beats.map((b,i)=>`  ${i+1}. ${b}`).join('\n')}\n`;
+  if(details) p += `Personal details: ${details}\n`;
+  p += `\nWrite the complete story only. Page by page. Nothing else.`;
+  return p;
+}
+
+async function generateStory() {
+  const btn = document.getElementById('generateBtn');
+  const loading = document.getElementById('loading');
+  const output = document.getElementById('outputSection');
+  const errorBox = document.getElementById('errorBox');
+
+  errorBox.style.display = 'none';
+  output.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Writing...';
+  loading.style.display = 'block';
+  loading.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  try {
+    const prompt = buildPrompt();
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      throw new Error(data.error || 'Something went wrong');
+    }
+
+    document.getElementById('storyOutput').textContent = data.story;
+    output.style.display = 'block';
+    output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch(err) {
+    errorBox.textContent = 'Sorry — something went wrong: ' + err.message;
+    errorBox.style.display = 'block';
+  } finally {
+    loading.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = 'Write my story →';
+  }
+}
+
+function copyStory() {
+  const text = document.getElementById('storyOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy story', 2000);
+  });
+}
+
+for(let i=0;i<5;i++) addBeat();
+</script>
+</body>
+</html>
