@@ -3,4 +3,5 @@
   "version": "1.0.0",
   "description": "Storyrise Story Builder — Trial",
   "private": true
+  "type": "module"
 }
