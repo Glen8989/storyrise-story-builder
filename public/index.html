@@ -4,297 +4,101 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Storyrise — Story Builder</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --sage: #7BA99A;
-    --sage-light: #D4E8E3;
-    --sage-dark: #4A7066;
-    --terra: #C4856A;
-    --terra-light: #F0D8CE;
-    --beige: #F7F3EE;
-    --cream: #FDFAF6;
-    --dark: #3D3D3D;
-    --mid: #6B6B6B;
-    --light-rule: #D8D0C8;
-    --white: #ffffff;
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
+    --sage: #7BA99A; --sage-light: #D4E8E3; --sage-dark: #4A7066;
+    --terra: #C4856A; --terra-light: #F0D8CE;
+    --beige: #F7F3EE; --cream: #FDFAF6;
+    --dark: #3D3D3D; --mid: #6B6B6B; --light-rule: #D8D0C8; --white: #ffffff;
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
   }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--beige);
-    color: var(--dark);
-    min-height: 100vh;
-  }
-
-  /* HEADER */
-  header {
-    background: var(--sage);
-    padding: 0 24px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--beige); color: var(--dark); min-height: 100vh; }
+  header { background: var(--sage); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
   .logo { color: white; font-weight: 700; font-size: 15px; letter-spacing: 0.05em; }
-  .logo span { font-weight: 400; opacity: 0.75; font-size: 12px; margin-left: 10px; letter-spacing: 0; }
+  .logo span { font-weight: 400; opacity: 0.75; font-size: 12px; margin-left: 10px; }
   .tagline { color: white; font-size: 11px; opacity: 0.7; font-style: italic; }
-
-  /* LAYOUT */
   .container { max-width: 780px; margin: 0 auto; padding: 32px 20px 80px; }
-
   .hero { text-align: center; margin-bottom: 32px; }
   .hero h1 { font-size: 28px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
   .hero p { font-size: 15px; color: var(--mid); line-height: 1.6; max-width: 520px; margin: 0 auto; }
-
-  /* SPEC BADGES */
   .specs { display: flex; gap: 10px; justify-content: center; margin: 16px 0 0; flex-wrap: wrap; }
-  .spec-badge {
-    background: var(--white);
-    border: 0.5px solid var(--light-rule);
-    border-radius: 20px;
-    padding: 5px 14px;
-    font-size: 12px;
-    color: var(--mid);
-  }
+  .spec-badge { background: var(--white); border: 0.5px solid var(--light-rule); border-radius: 20px; padding: 5px 14px; font-size: 12px; color: var(--mid); }
   .spec-badge strong { color: var(--sage-dark); }
-
-  /* SECTIONS */
-  .section {
-    background: var(--white);
-    border: 0.5px solid var(--light-rule);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    margin-bottom: 14px;
-  }
-  .section-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--sage);
-    margin-bottom: 14px;
-  }
-  .section-hint {
-    font-size: 12px;
-    color: var(--mid);
-    line-height: 1.5;
-    margin-bottom: 12px;
-  }
-
-  /* FORM ELEMENTS */
+  .section { background: var(--white); border: 0.5px solid var(--light-rule); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 14px; }
+  .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sage); margin-bottom: 14px; }
+  .section-hint { font-size: 12px; color: var(--mid); line-height: 1.5; margin-bottom: 12px; }
   label { font-size: 13px; color: var(--mid); display: block; margin-bottom: 5px; margin-top: 14px; }
   label:first-of-type { margin-top: 0; }
-  input[type=text], select, textarea {
-    width: 100%;
-    border: 0.5px solid var(--light-rule);
-    border-radius: var(--radius-sm);
-    padding: 9px 12px;
-    font-size: 14px;
-    font-family: inherit;
-    color: var(--dark);
-    background: var(--white);
-    outline: none;
-    transition: border-color 0.15s;
-  }
+  input[type=text], select, textarea { width: 100%; border: 0.5px solid var(--light-rule); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 14px; font-family: inherit; color: var(--dark); background: var(--white); outline: none; transition: border-color 0.15s; }
   input:focus, select:focus, textarea:focus { border-color: var(--sage); }
   textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
   select { cursor: pointer; }
-
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media(max-width:520px){ .row2 { grid-template-columns: 1fr; } }
 
   /* CHARACTERS */
-  .char-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-  @media(max-width:560px){ .char-grid { grid-template-columns: repeat(2,1fr); } }
+  .char-list { display: flex; flex-direction: column; gap: 8px; }
+  .char-row { display: flex; gap: 8px; align-items: center; }
+  .char-num { width: 24px; height: 24px; border-radius: 50%; background: var(--beige); border: 0.5px solid var(--light-rule); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--mid); flex-shrink: 0; }
+  .char-row input { flex: 1.2; min-width: 0; }
+  .char-row select { flex: 1.5; min-width: 0; font-size: 12px; padding: 9px 8px; }
+  .row-remove { background: none; border: none; color: var(--light-rule); cursor: pointer; font-size: 18px; line-height: 1; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; transition: color 0.1s, background 0.1s; }
+  .row-remove:hover { color: #c0392b; background: #fdf0ee; }
 
-  .char-card {
-    background: var(--beige);
-    border: 0.5px solid var(--light-rule);
-    border-radius: var(--radius-md);
-    padding: 12px 10px 10px;
-    position: relative;
-    text-align: center;
-  }
-  .char-num {
-    position: absolute; top: 7px; left: 9px;
-    font-size: 10px; color: var(--light-rule); font-weight: 600;
-  }
-  .avatar {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: #e8e4df; border: 0.5px solid var(--light-rule);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; font-weight: 600; color: var(--mid);
-    margin: 0 auto 9px; transition: background 0.15s, color 0.15s;
-  }
-  .avatar.filled { background: var(--sage-light); color: var(--sage-dark); }
-  .char-card input { font-size: 12px; text-align: center; padding: 5px 6px; }
-  .char-card select { font-size: 11px; padding: 4px 5px; margin-top: 5px; }
-
-  /* AGE CHIPS */
-  .age-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-  .chip {
-    padding: 6px 15px;
-    border: 0.5px solid var(--light-rule);
-    border-radius: 20px;
-    font-size: 13px;
-    color: var(--mid);
-    cursor: pointer;
-    background: var(--white);
-    transition: all 0.12s;
-    user-select: none;
-  }
-  .chip:hover { border-color: var(--sage); color: var(--sage-dark); }
-  .chip.active {
-    background: var(--sage-light);
-    border-color: var(--sage);
-    color: var(--sage-dark);
-    font-weight: 600;
-  }
-
-  /* LESSON CHIPS */
-  .lesson-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .lesson-chip {
-    padding: 5px 12px;
-    border: 0.5px dashed var(--light-rule);
-    border-radius: 20px;
-    font-size: 11px;
-    color: var(--mid);
-    cursor: pointer;
-    background: var(--beige);
-    transition: all 0.12s;
-  }
-  .lesson-chip:hover { border-color: var(--sage); color: var(--sage-dark); background: var(--sage-light); }
-  .lesson-chips-label { font-size: 11px; color: var(--light-rule); margin-top: 12px; margin-bottom: 0; }
-  hr.divider { border: none; border-top: 0.5px solid var(--light-rule); margin: 14px 0 10px; }
+  .add-btn { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--sage-dark); background: none; border: 0.5px dashed var(--sage); border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer; width: 100%; justify-content: center; margin-top: 10px; transition: background 0.12s; }
+  .add-btn:hover { background: var(--sage-light); }
+  .add-icon { width: 18px; height: 18px; border-radius: 50%; background: var(--sage-light); color: var(--sage-dark); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
 
   /* BEATS */
   .beats-list { display: flex; flex-direction: column; gap: 8px; }
   .beat-row { display: flex; gap: 8px; align-items: center; }
-  .beat-num {
-    width: 24px; height: 24px; border-radius: 50%;
-    background: var(--beige); border: 0.5px solid var(--light-rule);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; color: var(--mid); flex-shrink: 0;
-  }
+  .beat-num { width: 24px; height: 24px; border-radius: 50%; background: var(--beige); border: 0.5px solid var(--light-rule); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--mid); flex-shrink: 0; }
   .beat-row input { flex: 1; }
-  .beat-remove {
-    background: none; border: none; color: var(--light-rule);
-    cursor: pointer; font-size: 18px; line-height: 1;
-    padding: 2px 6px; border-radius: 4px; flex-shrink: 0;
-    transition: color 0.1s, background 0.1s;
-  }
-  .beat-remove:hover { color: #c0392b; background: #fdf0ee; }
 
-  .add-btn {
-    display: flex; align-items: center; gap: 7px;
-    font-size: 13px; color: var(--sage-dark);
-    background: none;
-    border: 0.5px dashed var(--sage);
-    border-radius: var(--radius-sm);
-    padding: 8px 16px; cursor: pointer;
-    width: 100%; justify-content: center; margin-top: 10px;
-    transition: background 0.12s;
-  }
-  .add-btn:hover { background: var(--sage-light); }
-  .add-icon {
-    width: 18px; height: 18px; border-radius: 50%;
-    background: var(--sage-light); color: var(--sage-dark);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; flex-shrink: 0;
-  }
+  /* LESSONS */
+  .lesson-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .lesson-chip { padding: 5px 12px; border: 0.5px dashed var(--light-rule); border-radius: 20px; font-size: 11px; color: var(--mid); cursor: pointer; background: var(--beige); transition: all 0.12s; }
+  .lesson-chip:hover { border-color: var(--sage); color: var(--sage-dark); background: var(--sage-light); }
+  hr.divider { border: none; border-top: 0.5px solid var(--light-rule); margin: 14px 0 10px; }
 
   /* ACTIONS */
   .actions { display: flex; gap: 12px; margin-top: 6px; }
-  .btn-clear {
-    flex: 1; background: var(--white);
-    border: 0.5px solid var(--light-rule);
-    border-radius: var(--radius-md); padding: 12px 16px;
-    font-size: 14px; cursor: pointer; color: var(--mid);
-    font-family: inherit; transition: background 0.12s;
-  }
+  .btn-clear { flex: 1; background: var(--white); border: 0.5px solid var(--light-rule); border-radius: var(--radius-md); padding: 12px 16px; font-size: 14px; cursor: pointer; color: var(--mid); font-family: inherit; transition: background 0.12s; }
   .btn-clear:hover { background: var(--beige); }
-  .btn-generate {
-    flex: 2; background: var(--sage);
-    border: none; border-radius: var(--radius-md);
-    padding: 12px 20px; font-size: 15px; font-weight: 600;
-    cursor: pointer; color: white; font-family: inherit;
-    transition: background 0.12s;
-  }
+  .btn-generate { flex: 2; background: var(--sage); border: none; border-radius: var(--radius-md); padding: 12px 20px; font-size: 15px; font-weight: 600; cursor: pointer; color: white; font-family: inherit; transition: background 0.12s; }
   .btn-generate:hover { background: var(--sage-dark); }
   .btn-generate:disabled { background: var(--light-rule); cursor: not-allowed; }
 
   /* OUTPUT */
-  #outputSection {
-    display: none;
-    background: var(--white);
-    border: 0.5px solid var(--light-rule);
-    border-radius: var(--radius-lg);
-    margin-top: 14px;
-    overflow: hidden;
-  }
-  .output-header {
-    background: var(--sage);
-    padding: 14px 20px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
+  #outputSection { display: none; background: var(--white); border: 0.5px solid var(--light-rule); border-radius: var(--radius-lg); margin-top: 14px; overflow: hidden; }
+  .output-header { background: var(--sage); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
   .output-header h2 { color: white; font-size: 14px; font-weight: 600; }
-  .btn-copy {
-    background: rgba(255,255,255,0.2); border: 0.5px solid rgba(255,255,255,0.4);
-    border-radius: var(--radius-sm); padding: 6px 14px;
-    font-size: 12px; color: white; cursor: pointer; font-family: inherit;
-    transition: background 0.12s;
-  }
-  .btn-copy:hover { background: rgba(255,255,255,0.3); }
-  #storyOutput {
-    padding: 24px;
-    font-size: 14px;
-    line-height: 1.8;
-    color: var(--dark);
-    white-space: pre-wrap;
-    font-family: Georgia, 'Times New Roman', serif;
-  }
+  .output-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-out { background: rgba(255,255,255,0.2); border: 0.5px solid rgba(255,255,255,0.4); border-radius: var(--radius-sm); padding: 6px 14px; font-size: 12px; color: white; cursor: pointer; font-family: inherit; transition: background 0.12s; }
+  .btn-out:hover { background: rgba(255,255,255,0.35); }
+  .btn-pdf { background: var(--terra); border: none; border-radius: var(--radius-sm); padding: 6px 16px; font-size: 12px; color: white; cursor: pointer; font-family: inherit; font-weight: 600; transition: background 0.12s; }
+  .btn-pdf:hover { background: #a86850; }
+  #storyOutput { padding: 24px; font-size: 14px; line-height: 1.85; color: var(--dark); white-space: pre-wrap; font-family: Georgia, 'Times New Roman', serif; }
+
+  /* REVISION */
+  #revisionSection { display: none; border-top: 0.5px solid var(--light-rule); padding: 20px; background: var(--beige); border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+  .revision-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--terra); margin-bottom: 8px; }
+  .revision-hint { font-size: 12px; color: var(--mid); margin-bottom: 10px; line-height: 1.5; }
+  #revisionInput { width: 100%; border: 0.5px solid var(--light-rule); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 14px; font-family: inherit; color: var(--dark); background: var(--white); outline: none; resize: vertical; min-height: 80px; transition: border-color 0.15s; }
+  #revisionInput:focus { border-color: var(--terra); }
+  .btn-revise { margin-top: 10px; background: var(--terra); border: none; border-radius: var(--radius-md); padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; color: white; font-family: inherit; transition: background 0.12s; }
+  .btn-revise:hover { background: #a86850; }
+  .btn-revise:disabled { background: var(--light-rule); cursor: not-allowed; }
 
   /* LOADING */
-  .loading {
-    display: none;
-    text-align: center;
-    padding: 40px 20px;
-  }
-  .spinner {
-    width: 36px; height: 36px;
-    border: 3px solid var(--sage-light);
-    border-top-color: var(--sage);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 14px;
-  }
+  .loading { display: none; text-align: center; padding: 40px 20px; }
+  .spinner { width: 36px; height: 36px; border: 3px solid var(--sage-light); border-top-color: var(--sage); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 14px; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading p { color: var(--mid); font-size: 13px; }
-
-  /* ERROR */
-  .error-box {
-    display: none;
-    background: #fdf0ee;
-    border: 0.5px solid #e8b4aa;
-    border-radius: var(--radius-sm);
-    padding: 12px 16px;
-    font-size: 13px;
-    color: #8b3a2a;
-    margin-top: 10px;
-  }
-
-  /* FOOTER */
-  footer {
-    text-align: center;
-    padding: 24px;
-    font-size: 11px;
-    color: var(--light-rule);
-  }
+  .error-box { display: none; background: #fdf0ee; border: 0.5px solid #e8b4aa; border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; color: #8b3a2a; margin-top: 10px; }
+  footer { text-align: center; padding: 24px; font-size: 11px; color: var(--light-rule); }
 </style>
 </head>
 <body>
@@ -305,7 +109,6 @@
 </header>
 
 <div class="container">
-
   <div class="hero">
     <h1>Build a Storyrise story</h1>
     <p>Fill in the details below and we'll generate a complete, personalised children's story — page by page, ready for illustration.</p>
@@ -320,12 +123,8 @@
   <!-- CHARACTERS -->
   <div class="section">
     <div class="section-label">Characters — up to 4</div>
-    <div class="char-grid">
-      <div class="char-card"><span class="char-num">1</span><div class="avatar" id="av0">?</div><input type="text" id="cn0" placeholder="Name" oninput="updateAvatar(0)"><select id="cr0"><option value="">Role...</option><option>Main character</option><option>Parent / caregiver</option><option>Sibling</option><option>Grandparent</option><option>Friend</option><option>Teacher</option><option>Other</option></select></div>
-      <div class="char-card"><span class="char-num">2</span><div class="avatar" id="av1">+</div><input type="text" id="cn1" placeholder="Name" oninput="updateAvatar(1)"><select id="cr1"><option value="">Role...</option><option>Main character</option><option>Parent / caregiver</option><option>Sibling</option><option>Grandparent</option><option>Friend</option><option>Teacher</option><option>Other</option></select></div>
-      <div class="char-card"><span class="char-num">3</span><div class="avatar" id="av2">+</div><input type="text" id="cn2" placeholder="Name" oninput="updateAvatar(2)"><select id="cr2"><option value="">Role...</option><option>Main character</option><option>Parent / caregiver</option><option>Sibling</option><option>Grandparent</option><option>Friend</option><option>Teacher</option><option>Other</option></select></div>
-      <div class="char-card"><span class="char-num">4</span><div class="avatar" id="av3">+</div><input type="text" id="cn3" placeholder="Name" oninput="updateAvatar(3)"><select id="cr3"><option value="">Role...</option><option>Main character</option><option>Parent / caregiver</option><option>Sibling</option><option>Grandparent</option><option>Friend</option><option>Teacher</option><option>Other</option></select></div>
-    </div>
+    <div class="char-list" id="charList"></div>
+    <button class="add-btn" id="addCharBtn" onclick="addChar()"><span class="add-icon">+</span> Add another character</button>
   </div>
 
   <!-- CATEGORY -->
@@ -337,23 +136,24 @@
     </div>
   </div>
 
-  <!-- AGE -->
+  <!-- AGE — dropdown -->
   <div class="section">
     <div class="section-label">Age of child</div>
-    <div class="section-hint">Selecting an age automatically applies the correct vocabulary level, word count, sentence complexity, and repetition rules for that age group.</div>
-    <div class="age-chips" id="ageChips">
-      <div class="chip" onclick="selectAge(this,'2')">2 yrs</div>
-      <div class="chip" onclick="selectAge(this,'3')">3 yrs</div>
-      <div class="chip" onclick="selectAge(this,'4')">4 yrs</div>
-      <div class="chip" onclick="selectAge(this,'5')">5 yrs</div>
-      <div class="chip" onclick="selectAge(this,'6')">6 yrs</div>
-      <div class="chip" onclick="selectAge(this,'7')">7 yrs</div>
-      <div class="chip" onclick="selectAge(this,'8')">8 yrs</div>
-      <div class="chip" onclick="selectAge(this,'9')">9 yrs</div>
-      <div class="chip" onclick="selectAge(this,'10')">10 yrs</div>
-      <div class="chip" onclick="selectAge(this,'11')">11 yrs</div>
-      <div class="chip" onclick="selectAge(this,'12')">12 yrs</div>
-    </div>
+    <div class="section-hint">Selecting an age automatically applies the correct vocabulary, word count, sentence complexity, and repetition rules for that age group.</div>
+    <select id="ageSel">
+      <option value="">Select age...</option>
+      <option value="2">2 years old</option>
+      <option value="3">3 years old</option>
+      <option value="4">4 years old</option>
+      <option value="5">5 years old</option>
+      <option value="6">6 years old</option>
+      <option value="7">7 years old</option>
+      <option value="8">8 years old</option>
+      <option value="9">9 years old</option>
+      <option value="10">10 years old</option>
+      <option value="11">11 years old</option>
+      <option value="12">12 years old</option>
+    </select>
   </div>
 
   <!-- LESSONS -->
@@ -362,7 +162,7 @@
     <div class="section-hint">What should the child feel or take away from this story? These are woven in as experiences — not stated as lessons.</div>
     <textarea id="lessons" placeholder="e.g. Mia learns that she is safe and loved even when mum and dad aren't in the room. She discovers her bedtime routine is something to look forward to. She feels proud that she can fall asleep all on her own."></textarea>
     <hr class="divider">
-    <label class="lesson-chips-label">Quick add:</label>
+    <div style="font-size:11px;color:var(--light-rule);margin-bottom:6px">Quick add:</div>
     <div class="lesson-chips">
       <div class="lesson-chip" onclick="addLesson('I am safe and loved')">I am safe and loved</div>
       <div class="lesson-chip" onclick="addLesson('I am brave and capable')">I am brave and capable</div>
@@ -400,19 +200,29 @@
     <button class="btn-generate" id="generateBtn" onclick="generateStory()">Write my story →</button>
   </div>
 
-  <!-- LOADING -->
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    <p>Writing your story — this takes about 20 seconds...</p>
+    <p id="loadingMsg">Writing your story — this takes about 20 seconds...</p>
   </div>
 
   <!-- OUTPUT -->
   <div id="outputSection">
     <div class="output-header">
       <h2>Your Storyrise story</h2>
-      <button class="btn-copy" onclick="copyStory()">Copy story</button>
+      <div class="output-btns">
+        <button class="btn-out" onclick="copyStory()">Copy story</button>
+        <button class="btn-pdf" onclick="downloadPDF()">Download PDF</button>
+      </div>
     </div>
     <div id="storyOutput"></div>
+
+    <!-- REVISION -->
+    <div id="revisionSection">
+      <div class="revision-label">Make changes to this story</div>
+      <div class="revision-hint">Describe any changes you'd like — a different ending, more detail on a beat, a warmer tone on a particular page, or anything you'd like adjusted. The full story will be rewritten with your changes applied.</div>
+      <textarea id="revisionInput" placeholder="e.g. Can you make the prayer moment feel warmer and more specific? Also can you add more detail about the rainbow unicorn on the last two pages."></textarea>
+      <button class="btn-revise" id="reviseBtn" onclick="reviseStory()">Update story →</button>
+    </div>
   </div>
 
 </div>
@@ -434,47 +244,62 @@ const SUBS = {
 };
 
 const AGE_PARAMS = {
-  "2": {band:"2–4",words:15,sentences:"single sentence preferred",vocab:"very simple everyday words only",rep:"required"},
-  "3": {band:"2–4",words:15,sentences:"single sentence preferred",vocab:"very simple everyday words only",rep:"required"},
-  "4": {band:"2–4",words:15,sentences:"single sentence preferred",vocab:"very simple everyday words only",rep:"required"},
-  "5": {band:"5–8",words:25,sentences:"2–3 sentences",vocab:"simple and clear",rep:"encouraged"},
-  "6": {band:"5–8",words:25,sentences:"2–3 sentences",vocab:"simple and clear",rep:"encouraged"},
-  "7": {band:"5–8",words:25,sentences:"2–3 sentences",vocab:"simple and clear",rep:"encouraged"},
-  "8": {band:"5–8",words:25,sentences:"2–3 sentences",vocab:"simple and clear",rep:"encouraged"},
-  "9": {band:"9–12",words:30,sentences:"2–3 sentences",vocab:"richer vocabulary permitted",rep:"optional"},
+  "2":{band:"2–4",words:15,sentences:"single sentence preferred",vocab:"very simple everyday words only",rep:"required"},
+  "3":{band:"2–4",words:15,sentences:"single sentence preferred",vocab:"very simple everyday words only",rep:"required"},
+  "4":{band:"2–4",words:15,sentences:"single sentence preferred",vocab:"very simple everyday words only",rep:"required"},
+  "5":{band:"5–8",words:25,sentences:"2–3 sentences",vocab:"simple and clear",rep:"encouraged"},
+  "6":{band:"5–8",words:25,sentences:"2–3 sentences",vocab:"simple and clear",rep:"encouraged"},
+  "7":{band:"5–8",words:25,sentences:"2–3 sentences",vocab:"simple and clear",rep:"encouraged"},
+  "8":{band:"5–8",words:25,sentences:"2–3 sentences",vocab:"simple and clear",rep:"encouraged"},
+  "9":{band:"9–12",words:30,sentences:"2–3 sentences",vocab:"richer vocabulary permitted",rep:"optional"},
   "10":{band:"9–12",words:30,sentences:"2–3 sentences",vocab:"richer vocabulary permitted",rep:"optional"},
   "11":{band:"9–12",words:30,sentences:"2–3 sentences",vocab:"richer vocabulary permitted",rep:"optional"},
   "12":{band:"9–12",words:30,sentences:"2–3 sentences",vocab:"richer vocabulary permitted",rep:"optional"},
 };
 
-let selectedAge = null;
+let charCount = 0;
 let beatCount = 0;
+let currentStory = '';
 
-function selectAge(el, age) {
-  document.querySelectorAll('#ageChips .chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  selectedAge = age;
+function addChar() {
+  const list = document.getElementById('charList');
+  if (list.children.length >= 4) return;
+  charCount++;
+  const n = list.children.length + 1;
+  const div = document.createElement('div');
+  div.className = 'char-row';
+  div.innerHTML = `
+    <div class="char-num">${n}</div>
+    <input type="text" placeholder="${n === 1 ? 'Main character name' : 'Character name'}">
+    <select>
+      <option value="">Role...</option>
+      <option${n === 1 ? ' selected' : ''}>Main character</option>
+      <option>Parent / caregiver</option>
+      <option>Sibling</option>
+      <option>Grandparent</option>
+      <option>Friend</option>
+      <option>Teacher</option>
+      <option>Other</option>
+    </select>
+    <button class="row-remove" onclick="removeChar(this)">×</button>`;
+  list.appendChild(div);
+  renumberChars();
+  updateAddCharBtn();
 }
 
-function addLesson(text) {
-  const ta = document.getElementById('lessons');
-  const cur = ta.value.trim();
-  ta.value = cur ? cur + ' ' + text + '.' : text + '.';
+function removeChar(btn) {
+  btn.closest('.char-row').remove();
+  renumberChars();
+  updateAddCharBtn();
 }
 
-function updateAvatar(i) {
-  const v = document.getElementById('cn' + i).value.trim();
-  const av = document.getElementById('av' + i);
-  av.textContent = v ? v.charAt(0).toUpperCase() : (i === 0 ? '?' : '+');
-  av.classList.toggle('filled', !!v);
+function renumberChars() {
+  document.querySelectorAll('#charList .char-num').forEach((el, i) => { el.textContent = i + 1; });
 }
 
-function updateSubs() {
-  const cat = document.getElementById('catSel').value;
-  const sub = document.getElementById('subSel');
-  if (!cat) { sub.innerHTML = '<option value="">Select category first...</option>'; return; }
-  const opts = SUBS[cat] || [];
-  sub.innerHTML = '<option value="">Select sub-category...</option>' + opts.map(s => `<option>${s}</option>`).join('');
+function updateAddCharBtn() {
+  const count = document.getElementById('charList').children.length;
+  document.getElementById('addCharBtn').style.display = count >= 4 ? 'none' : 'flex';
 }
 
 function addBeat() {
@@ -482,7 +307,7 @@ function addBeat() {
   const n = document.getElementById('beatsList').children.length + 1;
   const div = document.createElement('div');
   div.className = 'beat-row';
-  div.innerHTML = `<div class="beat-num">${n}</div><input type="text" placeholder="Story beat ${n}..."><button class="beat-remove" onclick="removeBeat(this)">×</button>`;
+  div.innerHTML = `<div class="beat-num">${n}</div><input type="text" placeholder="Story beat ${n}..."><button class="row-remove" onclick="removeBeat(this)">×</button>`;
   document.getElementById('beatsList').appendChild(div);
   renumberBeats();
 }
@@ -494,55 +319,85 @@ function renumberBeats() {
   document.querySelectorAll('#beatsList input').forEach((el, i) => { el.placeholder = `Story beat ${i + 1}...`; });
 }
 
+function addLesson(text) {
+  const ta = document.getElementById('lessons');
+  const cur = ta.value.trim();
+  ta.value = cur ? cur + ' ' + text + '.' : text + '.';
+}
+
+function updateSubs() {
+  const cat = document.getElementById('catSel').value;
+  const sub = document.getElementById('subSel');
+  if (!cat) { sub.innerHTML = '<option value="">Select category first...</option>'; return; }
+  const opts = SUBS[cat] || [];
+  sub.innerHTML = '<option value="">Select sub-category...</option>' + opts.map(s => `<option>${s}</option>`).join('');
+}
+
 function clearForm() {
-  [0,1,2,3].forEach(i => { document.getElementById('cn'+i).value=''; document.getElementById('cr'+i).value=''; updateAvatar(i); });
+  document.getElementById('charList').innerHTML = '';
+  charCount = 0; beatCount = 0;
+  updateAddCharBtn();
   document.getElementById('catSel').value = '';
   updateSubs();
+  document.getElementById('ageSel').value = '';
   document.getElementById('lessons').value = '';
   document.getElementById('details').value = '';
   document.getElementById('beatsList').innerHTML = '';
-  document.querySelectorAll('#ageChips .chip').forEach(c => c.classList.remove('active'));
-  selectedAge = null; beatCount = 0;
-  for(let i=0;i<5;i++) addBeat();
   document.getElementById('outputSection').style.display = 'none';
+  document.getElementById('revisionSection').style.display = 'none';
   document.getElementById('errorBox').style.display = 'none';
+  currentStory = '';
+  for (let i = 0; i < 3; i++) addChar();
+  for (let i = 0; i < 5; i++) addBeat();
 }
 
 function buildPrompt() {
   const chars = [];
-  [0,1,2,3].forEach(i => {
-    const n = document.getElementById('cn'+i).value.trim();
-    const r = document.getElementById('cr'+i).value;
-    if(n) chars.push(n + (r ? ' (' + r + ')' : ''));
+  document.querySelectorAll('#charList .char-row').forEach(row => {
+    const name = row.querySelector('input').value.trim();
+    const role = row.querySelector('select').value;
+    if (name) chars.push(name + (role ? ' (' + role + ')' : ''));
   });
   const cat = document.getElementById('catSel').value;
   const sub = document.getElementById('subSel').value;
+  const age = document.getElementById('ageSel').value;
   const lessons = document.getElementById('lessons').value.trim();
   const beats = Array.from(document.querySelectorAll('#beatsList input')).map(i => i.value.trim()).filter(Boolean);
   const details = document.getElementById('details').value.trim();
-  const ageP = selectedAge ? AGE_PARAMS[selectedAge] : null;
+  const ageP = age ? AGE_PARAMS[age] : null;
 
   let p = `You are a children's story writer for Storyrise — the original personalised social story brand. Write a warm, purposeful, ready-to-publish children's story.\n\n`;
   p += `BRAND VOICE: Calm, nurturing, empowering, purposeful. Warm and intelligent — not loud, babyish, or clinical. Every word earns its place.\n\n`;
   p += `BRAND VALUES: Faith woven naturally where relevant — never preachy. Childhood is sacred. Stories must be safe, age-appropriate, and positively formative. Help the child feel seen, understood, and ready. Strengthen family connection.\n\n`;
-  p += `STRICT FORMAT RULES:\n- Exactly 12 to 16 pages\n- Format every page as: PAGE [number] then the story text\n- After each page: [Illustration note: who is in the scene, what is happening, the emotional tone, and the lighting]\n- Illustrations: soft, warm, muted, nature-inspired, emotionally safe — never overstimulating\n- Arc: warm opening (pages 1–2) → journey through beats → calm affirming close (final 2 pages)\n- No titles, briefs, or summaries — story pages only\n- Exclamation marks on opening pages only — maximum 2 across the whole story\n- Main character's name on every page\n- At least 2 direct affirmations of the child\n- Conflict: mild acknowledgement of difficulty, always resolved warmly\n\n`;
+  p += `STRICT FORMAT RULES:\n- Exactly 12 to 16 pages\n- Format every page as: PAGE [number] then the story text on the next line\n- After each page of story text, add: [Illustration note: who is in the scene, what is happening, the emotional tone, and the lighting]\n- Illustrations: soft, warm, muted, nature-inspired, emotionally safe\n- Arc: warm opening (pages 1–2) → journey through beats → calm affirming close (final 2 pages)\n- Exclamation marks on opening pages only — maximum 2 across the whole story\n- Main character's name on every page\n- At least 2 direct affirmations of the child\n- Conflict: mild acknowledgement of difficulty, always resolved warmly\n\n`;
 
-  if(ageP) {
-    p += `AGE PARAMETERS (child is ${selectedAge} years old — band ${ageP.band}):\n- Max ${ageP.words} words per page\n- ${ageP.sentences} per page\n- Vocabulary: ${ageP.vocab}\n- Repetition: ${ageP.rep}\n`;
-    if(ageP.band==="2–4") p += `- Illustration carries the story — text is the warm anchor only\n`;
-    if(ageP.band==="5–8") p += `- Emotional nuance permitted and encouraged\n`;
-    if(ageP.band==="9–12") p += `- Richer emotional themes permitted — respect the child's intelligence\n`;
+  if (ageP) {
+    p += `AGE PARAMETERS (child is ${age} years old — band ${ageP.band}):\n- Max ${ageP.words} words per page of story text\n- ${ageP.sentences} per page\n- Vocabulary: ${ageP.vocab}\n- Repetition: ${ageP.rep}\n`;
+    if (ageP.band === "2–4") p += `- Illustration carries the story — text is the warm anchor only\n`;
+    if (ageP.band === "5–8") p += `- Emotional nuance permitted and encouraged\n`;
+    if (ageP.band === "9–12") p += `- Richer emotional themes permitted — respect the child's intelligence\n`;
     p += `\n`;
   }
 
-  if(lessons) p += `KEY MESSAGES (weave as experience, never state as lessons):\n${lessons}\n\n`;
+  if (lessons) p += `KEY MESSAGES (weave as experience, never state as lessons):\n${lessons}\n\n`;
   p += `STORY DETAILS:\n`;
-  if(chars.length) p += `Characters: ${chars.join(', ')}\n`;
-  if(cat) p += `Category: ${cat}${sub?' > '+sub:''}\n`;
-  if(beats.length) p += `Story beats:\n${beats.map((b,i)=>`  ${i+1}. ${b}`).join('\n')}\n`;
-  if(details) p += `Personal details: ${details}\n`;
+  if (chars.length) p += `Characters: ${chars.join(', ')}\n`;
+  if (cat) p += `Category: ${cat}${sub ? ' > ' + sub : ''}\n`;
+  if (beats.length) p += `Story beats:\n${beats.map((b, i) => `  ${i + 1}. ${b}`).join('\n')}\n`;
+  if (details) p += `Personal details: ${details}\n`;
   p += `\nWrite the complete story only. Page by page. Nothing else.`;
   return p;
+}
+
+async function callAPI(prompt) {
+  const res = await fetch('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt }),
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) throw new Error(data.error || 'Something went wrong');
+  return data.story;
 }
 
 async function generateStory() {
@@ -553,30 +408,22 @@ async function generateStory() {
 
   errorBox.style.display = 'none';
   output.style.display = 'none';
+  document.getElementById('revisionSection').style.display = 'none';
   btn.disabled = true;
   btn.textContent = 'Writing...';
   loading.style.display = 'block';
+  document.getElementById('loadingMsg').textContent = 'Writing your story — this takes about 20 seconds...';
   loading.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
   try {
-    const prompt = buildPrompt();
-    const res = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || data.error) {
-      throw new Error(data.error || 'Something went wrong');
-    }
-
-    document.getElementById('storyOutput').textContent = data.story;
+    const story = await callAPI(buildPrompt());
+    currentStory = story;
+    document.getElementById('storyOutput').textContent = story;
     output.style.display = 'block';
+    document.getElementById('revisionSection').style.display = 'block';
+    document.getElementById('revisionInput').value = '';
     output.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  } catch(err) {
+  } catch (err) {
     errorBox.textContent = 'Sorry — something went wrong: ' + err.message;
     errorBox.style.display = 'block';
   } finally {
@@ -586,16 +433,182 @@ async function generateStory() {
   }
 }
 
+async function reviseStory() {
+  const changes = document.getElementById('revisionInput').value.trim();
+  if (!changes) return;
+  const btn = document.getElementById('reviseBtn');
+  const loading = document.getElementById('loading');
+  const errorBox = document.getElementById('errorBox');
+
+  errorBox.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+  loading.style.display = 'block';
+  document.getElementById('loadingMsg').textContent = 'Applying your changes — almost there...';
+  loading.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  try {
+    const revisionPrompt = `You are a children's story editor for Storyrise. Below is an existing story and a list of requested changes. Rewrite the complete story incorporating all the changes. Keep everything that works well — only change what has been requested. Maintain the exact same format: PAGE [number] followed by story text, then [Illustration note: ...] after each page. Return the complete revised story only — nothing outside the page format.\n\nORIGINAL STORY:\n${currentStory}\n\nCHANGES REQUESTED:\n${changes}\n\nWrite the complete revised story now.`;
+    const revised = await callAPI(revisionPrompt);
+    currentStory = revised;
+    document.getElementById('storyOutput').textContent = revised;
+    document.getElementById('revisionInput').value = '';
+    document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    errorBox.textContent = 'Sorry — something went wrong: ' + err.message;
+    errorBox.style.display = 'block';
+  } finally {
+    loading.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = 'Update story →';
+  }
+}
+
 function copyStory() {
-  const text = document.getElementById('storyOutput').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.querySelector('.btn-copy');
+  navigator.clipboard.writeText(currentStory).then(() => {
+    const btn = document.querySelector('.btn-out');
     btn.textContent = 'Copied!';
     setTimeout(() => btn.textContent = 'Copy story', 2000);
   });
 }
 
-for(let i=0;i<5;i++) addBeat();
+function downloadPDF() {
+  if (!currentStory) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = 210, pageH = 297;
+  const mL = 22, mR = 22, mT = 30, mB = 28;
+  const cW = pageW - mL - mR;
+
+  const firstInput = document.querySelector('#charList .char-row input');
+  const childName = firstInput ? firstInput.value.trim() : '';
+  const cat = document.getElementById('catSel').value;
+  const sub = document.getElementById('subSel').value;
+  const storyTitle = childName ? childName + "'s Story" : 'My Storyrise Story';
+  const subtitle = sub || cat || 'A Storyrise Story';
+
+  // Strip illustration notes
+  const storyLines = currentStory.split('\n').filter(l => !l.trim().startsWith('[Illustration'));
+
+  let y = mT;
+  let docPage = 1;
+
+  function pageFooter() {
+    doc.setFillColor(247, 243, 238);
+    doc.rect(0, pageH - 14, pageW, 14, 'F');
+    doc.setFontSize(7.5);
+    doc.setTextColor(180, 168, 158);
+    doc.setFont('helvetica', 'italic');
+    doc.text('Stories that prepare kids for life.', mL, pageH - 5);
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(docPage), pageW - mR, pageH - 5, { align: 'right' });
+  }
+
+  function pageHeader() {
+    doc.setFillColor(123, 169, 154);
+    doc.rect(0, 0, pageW, 12, 'F');
+    doc.setFontSize(7);
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.text('STORYRISE', mL, 8);
+    doc.setFont('helvetica', 'normal');
+    doc.text(storyTitle, pageW - mR, 8, { align: 'right' });
+  }
+
+  function newPage() {
+    pageFooter();
+    doc.addPage();
+    docPage++;
+    y = mT;
+    pageHeader();
+  }
+
+  // ── COVER ──
+  doc.setFillColor(247, 243, 238);
+  doc.rect(0, 0, pageW, pageH, 'F');
+  doc.setFillColor(123, 169, 154);
+  doc.rect(0, 0, pageW, 18, 'F');
+  doc.setFillColor(196, 133, 106);
+  doc.rect(0, 18, 5, pageH - 32, 'F');
+  doc.setFontSize(8);
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.text('STORYRISE', mL, 11);
+
+  doc.setFontSize(30);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(61, 61, 61);
+  const titleLines = doc.splitTextToSize(storyTitle, cW - 10);
+  let ty = 95;
+  titleLines.forEach(tl => { doc.text(tl, pageW / 2, ty, { align: 'center' }); ty += 14; });
+
+  doc.setFontSize(13);
+  doc.setFont('helvetica', 'italic');
+  doc.setTextColor(107, 107, 107);
+  doc.text(subtitle, pageW / 2, ty + 6, { align: 'center' });
+
+  doc.setDrawColor(196, 133, 106);
+  doc.setLineWidth(0.8);
+  doc.line(pageW / 2 - 28, ty + 14, pageW / 2 + 28, ty + 14);
+
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'italic');
+  doc.setTextColor(123, 169, 154);
+  doc.text('Stories that prepare kids for life.', pageW / 2, ty + 22, { align: 'center' });
+
+  doc.setFillColor(247, 243, 238);
+  doc.rect(0, pageH - 14, pageW, 14, 'F');
+  doc.setFontSize(7.5);
+  doc.setTextColor(180, 168, 158);
+  doc.setFont('helvetica', 'normal');
+  doc.text('© 2026 Storyrise', pageW / 2, pageH - 5, { align: 'center' });
+
+  // ── STORY PAGES ──
+  doc.addPage();
+  docPage++;
+  y = mT;
+  pageHeader();
+
+  storyLines.forEach(rawLine => {
+    const line = rawLine.trim();
+    if (!line) { y += 3; return; }
+
+    if (/^PAGE\s+\d+/i.test(line)) {
+      if (y > mT + 15) y += 8;
+      if (y + 18 > pageH - mB) newPage();
+      doc.setFillColor(212, 232, 227);
+      doc.roundedRect(mL, y - 5, 30, 8, 2, 2, 'F');
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(74, 112, 102);
+      doc.text(line.replace(/PAGE\s+/i, 'Page '), mL + 2, y + 0.5);
+      y += 11;
+      return;
+    }
+
+    doc.setFontSize(13.5);
+    doc.setFont('times', 'normal');
+    doc.setTextColor(61, 61, 61);
+    const wrapped = doc.splitTextToSize(line, cW);
+    wrapped.forEach(wl => {
+      if (y + 8 > pageH - mB) newPage();
+      doc.text(wl, mL, y);
+      y += 7.8;
+    });
+    y += 2;
+  });
+
+  pageFooter();
+
+  const filename = childName
+    ? childName.toLowerCase().replace(/\s+/g, '-') + '-storyrise-story.pdf'
+    : 'storyrise-story.pdf';
+  doc.save(filename);
+}
+
+// ── INIT ──
+for (let i = 0; i < 3; i++) addChar();
+for (let i = 0; i < 5; i++) addBeat();
 </script>
 </body>
 </html>
